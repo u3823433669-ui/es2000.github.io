@@ -18,7 +18,6 @@ const App: React.FC = () => {
   const ACCESS_CODE = "study2025"; 
   const DEFAULT_WORDS = ["Apple", "Cyberpunk", "Universe", "Dream", "Meditation"];
 
-  // 初始化加载
   useEffect(() => {
     if (isLoggedIn) {
       const savedData = localStorage.getItem('my_vocab_data');
@@ -30,7 +29,6 @@ const App: React.FC = () => {
     }
   }, [isLoggedIn]);
 
-  // 处理单词并生成/获取图片
   const processWords = async (wordList: string[]) => {
     setIsLoading(true);
     setCurrentIndex(0);
@@ -42,7 +40,6 @@ const App: React.FC = () => {
 
       setLoadingStatus(`正在为 "${word}" 构思画面... (${i + 1}/${wordList.length})`);
       
-      // 尝试调用 AI 生成图片，如果失败则使用占位图
       let imageUrl = await generateAIImage(`High quality artistic visualization of the word: ${word}, clean background, cinematic lighting, 4k`);
       
       if (!imageUrl) {
@@ -88,7 +85,6 @@ const App: React.FC = () => {
     setCards(prev => prev.map(c => c.id === id ? { ...c, isFlipped: !c.isFlipped } : c));
   };
 
-  // 登录界面
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 p-6 font-sans">
@@ -117,7 +113,6 @@ const App: React.FC = () => {
     );
   }
 
-  // 加载动画
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 p-10 text-center">
@@ -131,10 +126,8 @@ const App: React.FC = () => {
     );
   }
 
-  // 主界面
   return (
     <div className="max-w-md mx-auto px-6 py-12 min-h-screen flex flex-col font-sans">
-      {/* 头部导航 */}
       <div className="flex justify-between items-center mb-10">
         <div>
           <h1 className="text-white font-black text-2xl tracking-tighter">V-VOCAB</h1>
@@ -145,7 +138,6 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      {/* 卡片区域 */}
       <div className="flex-1 flex flex-col">
         {cards.length > 0 ? (
           <Card card={cards[currentIndex]} onFlip={handleFlip} onDelete={() => {}} />
@@ -155,7 +147,6 @@ const App: React.FC = () => {
           </div>
         )}
         
-        {/* 控制按钮 */}
         <div className="grid grid-cols-4 gap-4 mt-10">
           <button 
             onClick={() => setCurrentIndex(prev => (prev - 1 + cards.length) % cards.length)}
@@ -174,7 +165,6 @@ const App: React.FC = () => {
           </button>
         </div>
 
-        {/* 管理区域 */}
         <div className="mt-12 pt-6 border-t border-white/5 flex flex-col gap-4">
           <button 
             onClick={() => setShowAdmin(!showAdmin)}
@@ -185,7 +175,7 @@ const App: React.FC = () => {
           </button>
 
           {showAdmin && (
-            <div className="bg-slate-900 p-6 rounded-[2rem] border border-white/5 shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div className="bg-slate-900 p-6 rounded-[2rem] border border-white/5 shadow-2xl">
               <label className="block text-white text-[10px] font-bold mb-3 uppercase tracking-tighter opacity-50">输入单词（用空格、逗号或回车分隔）</label>
               <textarea 
                 value={rawInput}
