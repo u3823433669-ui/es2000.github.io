@@ -1,203 +1,139 @@
 
 import React, { useState, useEffect } from 'react';
-import { CardData } from './types';
-import Card from './components/Card';
-import { generateAIImage } from './services/gemini';
+
+// 根据你提供的截图，这些是根目录中确实存在的文件名
+const WORD_LIST = [
+  "alentar", "arana", "barba", "cantidad", "cartel", "cartelera", "comodo", "creido"
+];
 
 const App: React.FC = () => {
-  const [cards, setCards] = useState<CardData[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [passcode, setPasscode] = useState('');
-  const [loginError, setLoginError] = useState(false);
-  const [showAdmin, setShowAdmin] = useState(false);
-  const [rawInput, setRawInput] = useState('');
-  const [loadingStatus, setLoadingStatus] = useState('');
+  const [currentExt, setCurrentExt] = useState<'jpg' | 'png'>('jpg');
 
-  const ACCESS_CODE = "study2025"; 
-  const DEFAULT_WORDS = ["Apple", "Cyberpunk", "Universe", "Dream", "Meditation"];
+  const currentWord = WORD_LIST[currentIndex];
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      const savedData = localStorage.getItem('my_vocab_data');
-      if (savedData) {
-        setCards(JSON.parse(savedData));
-      } else {
-        processWords(DEFAULT_WORDS);
-      }
-    }
-  }, [isLoggedIn]);
+  // 这里的路径不再包含 "images/"，直接指向根目录
+  const imageUrl = `${currentWord}.${currentExt}`;
 
-  const processWords = async (wordList: string[]) => {
-    setIsLoading(true);
-    setCurrentIndex(0);
-    const newCards: CardData[] = [];
-
-    for (let i = 0; i < wordList.length; i++) {
-      const word = wordList[i].trim();
-      if (!word) continue;
-
-      setLoadingStatus(`正在为 "${word}" 构思画面... (${i + 1}/${wordList.length})`);
-      
-      let imageUrl = await generateAIImage(`High quality artistic visualization of the word: ${word}, clean background, cinematic lighting, 4k`);
-      
-      if (!imageUrl) {
-        imageUrl = `https://picsum.photos/seed/${encodeURIComponent(word)}/600/800`;
-      }
-
-      newCards.push({
-        id: `card-${Date.now()}-${i}`,
-        frontType: 'text',
-        frontContent: word,
-        backType: 'image',
-        backContent: imageUrl,
-        isFlipped: false,
-      });
-    }
-
-    setCards(newCards);
-    localStorage.setItem('my_vocab_data', JSON.stringify(newCards));
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsFlipped(false);
+    setImgError(false);
     setIsLoading(false);
-    setLoadingStatus('');
+    setCurrentExt('jpg'); // 重置为默认后缀
+    setCurrentIndex((prev) => (prev + 1) % WORD_LIST.length);
   };
 
-  const handleBulkImport = () => {
-    const words = rawInput.split(/[\n,，\s]+/).filter(w => w.trim() !== '');
-    if (words.length > 0) {
-      processWords(words);
-      setShowAdmin(false);
-      setRawInput('');
+  const toggleFlip = () => {
+    if (!isFlipped) {
+      setIsLoading(true);
+      setImgError(false);
     }
+    setIsFlipped(!isFlipped);
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passcode === ACCESS_CODE) {
-      setIsLoggedIn(true);
+  const onImageLoad = () => {
+    setIsLoading(false);
+    setImgError(false);
+  };
+
+  const onImageError = () => {
+    // 如果 jpg 加载失败，尝试加载 png (因为你截图中有些单词同时有 jpg 和 png)
+    if (currentExt === 'jpg') {
+      setCurrentExt('png');
     } else {
-      setLoginError(true);
-      setPasscode('');
+      setIsLoading(false);
+      setImgError(true);
     }
   };
-
-  const handleFlip = (id: string) => {
-    setCards(prev => prev.map(c => c.id === id ? { ...c, isFlipped: !c.isFlipped } : c));
-  };
-
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 p-6 font-sans">
-        <div className="w-full max-w-sm bg-slate-900/40 border border-white/10 p-10 rounded-[2.5rem] backdrop-blur-2xl text-center shadow-2xl">
-          <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-rose-600 rounded-3xl flex items-center justify-center mx-auto mb-8 rotate-6 shadow-2xl">
-            <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-black text-white mb-2 tracking-tight">V-Vocab 视觉词库</h2>
-          <p className="text-slate-500 text-xs mb-8 uppercase tracking-widest font-bold">解锁你的视觉记忆</p>
-          <form onSubmit={handleLogin}>
-            <input 
-              type="password" 
-              value={passcode} 
-              onChange={(e) => {setPasscode(e.target.value); setLoginError(false);}}
-              className="w-full bg-black/40 border-2 border-white/5 rounded-2xl py-4 text-center text-2xl tracking-[0.5em] text-white focus:border-orange-500 outline-none transition-all mb-4"
-              placeholder="••••"
-            />
-            {loginError && <p className="text-rose-500 text-[10px] mb-4 font-bold uppercase">密码验证失败</p>}
-            <button className="w-full bg-white text-black font-black py-4 rounded-2xl hover:bg-orange-500 hover:text-white active:scale-95 transition-all shadow-lg">进入实验室</button>
-          </form>
-          <p className="mt-8 text-[10px] text-slate-600 font-medium">PASSWORD: study2025</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 p-10 text-center">
-        <div className="relative w-24 h-24 mb-8">
-          <div className="absolute inset-0 border-4 border-orange-500/20 rounded-full"></div>
-          <div className="absolute inset-0 border-4 border-t-orange-500 rounded-full animate-spin"></div>
-        </div>
-        <h2 className="text-white font-black text-xl mb-4">AI 正在生成视觉记忆...</h2>
-        <p className="text-slate-400 text-sm max-w-xs leading-relaxed">{loadingStatus}</p>
-      </div>
-    );
-  }
 
   return (
-    <div className="max-w-md mx-auto px-6 py-12 min-h-screen flex flex-col font-sans">
-      <div className="flex justify-between items-center mb-10">
-        <div>
-          <h1 className="text-white font-black text-2xl tracking-tighter">V-VOCAB</h1>
-          <div className="h-1 w-8 bg-orange-500 rounded-full mt-1"></div>
-        </div>
-        <div className="bg-slate-900/80 px-4 py-2 rounded-2xl border border-white/5 text-orange-400 font-mono text-sm font-bold shadow-xl">
-          {cards.length > 0 ? currentIndex + 1 : 0} <span className="text-slate-600 mx-1">/</span> {cards.length}
-        </div>
+    <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center p-4 font-sans text-white overflow-hidden">
+      {/* 动态背景 */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-orange-500/10 blur-[120px] rounded-full animate-pulse"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 blur-[120px] rounded-full animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
 
-      <div className="flex-1 flex flex-col">
-        {cards.length > 0 ? (
-          <Card card={cards[currentIndex]} onFlip={handleFlip} onDelete={() => {}} />
-        ) : (
-          <div className="flex-1 flex items-center justify-center border-4 border-dashed border-white/5 rounded-[3rem]">
-            <p className="text-slate-600 font-bold">暂无单词，请点击下方导入</p>
-          </div>
-        )}
-        
-        <div className="grid grid-cols-4 gap-4 mt-10">
-          <button 
-            onClick={() => setCurrentIndex(prev => (prev - 1 + cards.length) % cards.length)}
-            disabled={cards.length <= 1}
-            className="col-span-1 bg-slate-900 h-20 rounded-[2rem] flex items-center justify-center border border-white/5 active:scale-90 transition-all text-white hover:bg-slate-800 disabled:opacity-30 shadow-xl"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7" /></svg>
-          </button>
-          <button 
-            onClick={() => setCurrentIndex(prev => (prev + 1) % cards.length)}
-            disabled={cards.length <= 1}
-            className="col-span-3 bg-white h-20 rounded-[2rem] flex items-center justify-center gap-3 font-black text-black active:scale-95 transition-all text-xl hover:bg-orange-500 hover:text-white shadow-xl disabled:opacity-30"
-          >
-            <span>下一张卡片</span>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-          </button>
-        </div>
+      <div className="max-w-sm w-full relative">
+        <header className="text-center mb-8">
+          <h1 className="text-lg font-black tracking-[0.4em] opacity-40 uppercase">Memory Cards</h1>
+        </header>
 
-        <div className="mt-12 pt-6 border-t border-white/5 flex flex-col gap-4">
-          <button 
-            onClick={() => setShowAdmin(!showAdmin)}
-            className="flex items-center gap-2 text-[10px] font-black text-slate-500 hover:text-orange-400 uppercase tracking-widest text-left transition-colors"
-          >
-            <span className={`transition-transform duration-300 ${showAdmin ? 'rotate-180' : ''}`}>▼</span>
-            {showAdmin ? '隐藏管理面板' : '批量导入新单词'}
-          </button>
-
-          {showAdmin && (
-            <div className="bg-slate-900 p-6 rounded-[2rem] border border-white/5 shadow-2xl">
-              <label className="block text-white text-[10px] font-bold mb-3 uppercase tracking-tighter opacity-50">输入单词（用空格、逗号或回车分隔）</label>
-              <textarea 
-                value={rawInput}
-                onChange={(e) => setRawInput(e.target.value)}
-                placeholder="例如: Apple, Banana, Sunshine..."
-                className="w-full h-32 bg-black/50 border border-white/5 rounded-2xl p-4 text-white text-sm focus:border-orange-500 outline-none mb-4 transition-all"
-              />
-              <button 
-                onClick={handleBulkImport}
-                className="w-full bg-orange-600 text-white font-black py-4 rounded-2xl hover:bg-orange-500 transition-all shadow-lg active:scale-95"
-              >
-                生成 AI 视觉卡片
-              </button>
-              <p className="mt-4 text-[9px] text-slate-500 leading-relaxed">提示：AI 生成需要时间，建议一次导入不超过 10 个单词以获得最佳体验。</p>
+        <div 
+          className="relative aspect-[3/4] w-full perspective-2000 cursor-pointer"
+          onClick={toggleFlip}
+        >
+          <div className={`relative w-full h-full transition-all duration-700 preserve-3d ${isFlipped ? 'rotate-y-180 scale-105' : 'scale-100'}`}>
+            
+            {/* Front: Text */}
+            <div className="absolute inset-0 backface-hidden bg-[#0f172a] border border-white/10 rounded-[2.5rem] flex flex-col items-center justify-center p-8 shadow-2xl">
+              <div className="w-10 h-1 bg-orange-500/40 rounded-full mb-10"></div>
+              <h2 className="text-4xl font-black tracking-tighter text-center uppercase leading-none">
+                {currentWord}
+              </h2>
+              <div className="mt-16 flex flex-col items-center opacity-30">
+                <div className="w-8 h-8 border-2 border-dashed border-white rounded-full flex items-center justify-center animate-spin-slow">
+                   <span className="text-[10px]">↻</span>
+                </div>
+                <span className="text-[9px] font-bold tracking-[0.2em] mt-3 uppercase">Click to Reveal</span>
+              </div>
             </div>
-          )}
+
+            {/* Back: Image */}
+            <div className="absolute inset-0 backface-hidden rotate-y-180 bg-[#0f172a] border-2 border-orange-500/50 rounded-[2.5rem] overflow-hidden shadow-[0_0_60px_-15px_rgba(249,115,22,0.4)]">
+              {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-[#0f172a] z-10">
+                  <div className="w-6 h-6 border-2 border-orange-500/20 border-t-orange-500 rounded-full animate-spin"></div>
+                </div>
+              )}
+              
+              {imgError ? (
+                <div className="flex flex-col items-center justify-center h-full p-8 text-center text-white/20">
+                   <p className="text-xs font-bold uppercase mb-2">图片未找到</p>
+                   <p className="text-[10px] font-mono break-all">{imageUrl}</p>
+                </div>
+              ) : (
+                <img 
+                  src={imageUrl} 
+                  className={`w-full h-full object-cover transition-all duration-500 ${isLoading ? 'scale-110 blur-sm opacity-0' : 'scale-100 blur-0 opacity-100'}`}
+                  onLoad={onImageLoad}
+                  onError={onImageError}
+                  alt={currentWord}
+                />
+              )}
+              
+              <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end justify-center pb-6">
+                <span className="text-[10px] font-black tracking-[0.3em] uppercase text-orange-500">{currentWord}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-10 flex items-center gap-4">
+          <div className="px-4 py-2 bg-white/5 rounded-xl border border-white/5 font-mono text-xs text-white/40">
+            {currentIndex + 1} / {WORD_LIST.length}
+          </div>
+          <button 
+            onClick={handleNext}
+            className="flex-1 bg-white text-black font-black py-4 rounded-2xl hover:bg-orange-500 hover:text-white transition-all active:scale-95 shadow-xl uppercase tracking-widest text-xs"
+          >
+            Next Card
+          </button>
         </div>
       </div>
-      
-      <footer className="mt-auto pt-10 text-center text-[9px] text-slate-700 font-bold uppercase tracking-[0.2em]">
-        Visual Vocabulary Lab &copy; 2025
-      </footer>
+
+      <style>{`
+        .perspective-2000 { perspective: 2000px; }
+        .preserve-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .animate-spin-slow { animation: spin 4s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 };
