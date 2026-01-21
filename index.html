@@ -21,16 +21,16 @@
         .container {
             text-align: center;
             width: 95%;
-            max-width: 800px; /* 增大容器宽度 */
+            max-width: 800px; 
         }
         .card {
             background: #1e293b;
-            min-height: 500px; /* 增大卡片最小高度 */
+            min-height: 500px; 
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50px; /* 稍微增大圆角 */
-            border: 6px solid #f97316; /* 边框加粗 */
+            border-radius: 50px; 
+            border: 6px solid #f97316; 
             box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8);
             cursor: pointer;
             padding: 30px;
@@ -41,17 +41,17 @@
             transform: scale(0.96);
         }
         .filename {
-            font-size: 5rem; /* 增大文字大小：从 3rem 增加到 5rem */
+            font-size: 5rem; 
             font-weight: 900;
-            text-transform: uppercase;
+            /* 移除了 text-transform: uppercase 以支持小写显示 */
             letter-spacing: -2px;
-            word-break: break-word; /* 允许单词在较长时换行 */
+            word-break: break-word; 
             pointer-events: none;
             line-height: 1.1;
         }
         img {
             max-width: 100%;
-            max-height: 500px; /* 增大图片最大高度 */
+            max-height: 500px; 
             border-radius: 25px;
             display: none;
             object-fit: contain;
@@ -59,7 +59,7 @@
         }
         .btn {
             margin-top: 50px;
-            padding: 22px 60px; /* 增大按钮尺寸 */
+            padding: 22px 60px; 
             background: #f97316;
             color: white;
             border: none;
@@ -67,7 +67,7 @@
             font-weight: bold;
             cursor: pointer;
             letter-spacing: 3px;
-            font-size: 1.5rem; /* 增大按钮文字 */
+            font-size: 1.5rem; 
             box-shadow: 0 12px 24px -5px rgba(249, 115, 22, 0.6);
             transition: all 0.2s;
         }
@@ -100,7 +100,6 @@
             word-break: break-all;
         }
 
-        /* 针对手机等小屏幕的微调 */
         @media (max-width: 600px) {
             .filename {
                 font-size: 3.5rem;
