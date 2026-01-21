@@ -1,10 +1,2 @@
 
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App';
-
-const container = document.getElementById('root');
-if (container) {
-  const root = createRoot(container);
-  root.render(<App />);
-}
+// 此文件已禁用，以确保 index.html 纯静态运行。
