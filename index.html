@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Only</title>
+    <title>Random Image</title>
     <style>
         body {
             margin: 0;
@@ -16,6 +16,7 @@
             min-height: 100vh;
             color: white;
             font-family: sans-serif;
+            overflow: hidden;
         }
         .container {
             text-align: center;
@@ -25,20 +26,38 @@
         img {
             width: 100%;
             height: auto;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             border: 4px solid #f97316;
+            display: none; /* 初始隐藏，加载成功后显示 */
+        }
+        .btn {
+            margin-top: 30px;
+            padding: 12px 24px;
+            background: #f97316;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: transform 0.2s;
+        }
+        .btn:active {
+            transform: scale(0.95);
         }
         p {
             margin-top: 20px;
-            opacity: 0.5;
-            font-size: 12px;
+            opacity: 0.4;
+            font-size: 10px;
             letter-spacing: 2px;
+            text-transform: uppercase;
         }
-        .error-box {
+        #error {
             border: 2px dashed #f97316;
-            padding: 40px;
+            padding: 30px;
             border-radius: 20px;
+            display: none;
         }
     </style>
 <script type="importmap">
@@ -55,22 +74,56 @@
 </head>
 <body>
     <div class="container">
-        <!-- 直接通过 <img> 标签尝试加载图片，没有任何 JS 干扰 -->
-        <img 
-            src="Edibujar/pared.jpg" 
-            alt="Pared" 
-            onerror="this.style.display='none'; document.getElementById('error').style.display='block';"
-        >
+        <img id="displayImage" src="" alt="Random Image">
         
-        <!-- 错误提示（仅在图片加载失败时显示） -->
-        <div id="error" class="error-box" style="display:none;">
-            <h1 style="color: #f97316;">图片读取失败</h1>
-            <p>请确认文件路径：</p>
-            <code style="background: rgba(255,255,255,0.1); padding: 5px; border-radius: 4px;">Edibujar/pared.jpg</code>
-            <p>图片文件名必须完全匹配（注意大小写）</p>
+        <div id="error">
+            <h2 style="color: #f97316;">图片载入失败</h2>
+            <p id="errorPath"></p>
         </div>
 
-        <p>DIRECT IMAGE VIEW</p>
+        <button class="btn" onclick="showRandomImage()">再换一张</button>
+        <p>Random Gallery Mode</p>
     </div>
+
+    <script>
+        // 在这里添加你的图片文件名列表
+        // 假设你在 Edibujar 文件夹下还有其他图片
+        const images = [
+            "pared.jpg",
+            // 如果有其他图片，请在此添加文件名，例如:
+             "peligroso.jpg",
+            // "image3.jpg"
+        ];
+
+        function showRandomImage() {
+            const imgElement = document.getElementById('displayImage');
+            const errorElement = document.getElementById('error');
+            
+            // 随机选择
+            const randomIndex = Math.floor(Math.random() * images.length);
+            const selectedImage = images[randomIndex];
+            const fullPath = "Edibujar/" + selectedImage;
+
+            // 重置状态
+            imgElement.style.display = 'none';
+            errorElement.style.display = 'none';
+            
+            // 设置路径
+            imgElement.src = fullPath;
+            
+            imgElement.onload = function() {
+                imgElement.style.display = 'block';
+            };
+
+            imgElement.onerror = function() {
+                imgElement.style.display = 'none';
+                errorElement.style.display = 'block';
+                document.getElementById('errorPath').innerText = "路径: " + fullPath;
+            };
+        }
+
+        // 页面载入时立即执行一次
+        window.onload = showRandomImage;
+    </script>
 </body>
 </html>
