@@ -23,7 +23,6 @@
             width: 90%;
             max-width: 500px;
         }
-        /* 卡片容器 */
         .card {
             background: #1e293b;
             min-height: 350px;
@@ -41,7 +40,6 @@
         .card:active {
             transform: scale(0.96);
         }
-        /* 文件名文字样式 */
         .filename {
             font-size: 3rem;
             font-weight: 900;
@@ -50,7 +48,6 @@
             word-break: break-all;
             pointer-events: none;
         }
-        /* 图片样式 */
         img {
             max-width: 100%;
             max-height: 350px;
@@ -77,9 +74,6 @@
             background: #fb923c;
             transform: translateY(-2px);
         }
-        .btn:active {
-            transform: translateY(0);
-        }
         p.tip {
             margin-top: 25px;
             opacity: 0.4;
@@ -101,6 +95,7 @@
             background: rgba(0,0,0,0.3);
             padding: 5px;
             border-radius: 5px;
+            word-break: break-all;
         }
     </style>
 <script type="importmap">
@@ -117,7 +112,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- 点击卡片区域显示图片 -->
         <div class="card" id="mainCard" onclick="revealImage()">
             <div id="textLabel" class="filename">READY</div>
             <img id="displayImage" src="" alt="Card Image">
@@ -132,44 +126,48 @@
     </div>
 
     <script>
-        // 图片文件名列表
         const images = [
+            "pluma.jpg",
+            "arana.jpg",
             "peligroso.jpg",
             "pared.jpg"
+            
         ];
 
-        let currentIndex = -1; // 使用索引来跟踪，而不是单纯随机，防止“到头了”的错觉
+        let currentIndex = -1;
         let isRevealed = false;
 
-        // 获取下一个单词
         function nextWord() {
             const textLabel = document.getElementById('textLabel');
             const imgElement = document.getElementById('displayImage');
             const errorElement = document.getElementById('error');
             const card = document.getElementById('mainCard');
             
-            // 循环逻辑：如果到头了，就回到 0
+            // 顺序循环逻辑
             currentIndex = (currentIndex + 1) % images.length;
             const currentImageFile = images[currentIndex];
+            
+            // 重置揭示状态
             isRevealed = false;
 
-            // 提取展示文字（不含后缀）
+            // 提取展示文字
             const displayName = currentImageFile.split('.')[0];
 
-            // 彻底重置状态：隐藏旧图和报错，显示新文字
+            // 彻底清理旧状态
+            // 关键：在设置 src 为空字符串之前，移除 onload 和 onerror 监听，防止旧事件干扰
+            imgElement.onload = null;
+            imgElement.onerror = null;
+            imgElement.src = ""; 
+            imgElement.style.display = 'none';
+            
             textLabel.innerText = displayName;
             textLabel.style.display = 'block';
-            
-            imgElement.style.display = 'none';
-            imgElement.src = ""; // 重要：清空 src 防止触发旧的 onerror
             
             errorElement.style.display = 'none';
             card.style.backgroundColor = '#1e293b';
         }
 
-        // 点击卡片显示图片
         function revealImage() {
-            // 如果已经显示了或者没有当前图片，就不执行
             if (isRevealed || currentIndex === -1) return;
 
             const textLabel = document.getElementById('textLabel');
@@ -179,13 +177,10 @@
             const card = document.getElementById('mainCard');
 
             const fileName = images[currentIndex];
-            const fullPath = "Edibujar/" + fileName;
+            // 添加时间戳 v 参数，强制绕过可能的第二个循环缓存 bug
+            const fullPath = "Edibujar/" + fileName + "?v=" + new Date().getTime();
             
-            // 标记为已点击
             isRevealed = true;
-            
-            // 预加载处理
-            imgElement.src = fullPath;
             
             imgElement.onload = function() {
                 textLabel.style.display = 'none';
@@ -198,12 +193,13 @@
                 textLabel.style.display = 'none';
                 imgElement.style.display = 'none';
                 errorElement.style.display = 'flex';
-                errorPath.innerText = "路径: " + fullPath;
+                errorPath.innerText = "路径: " + "Edibujar/" + fileName;
                 card.style.backgroundColor = '#2d1a1a';
             };
+
+            imgElement.src = fullPath;
         }
 
-        // 页面启动时初始化显示第一个单词
         window.onload = nextWord;
     </script>
 </body>
