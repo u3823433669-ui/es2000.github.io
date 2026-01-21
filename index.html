@@ -102,7 +102,7 @@
             transform: translateY(-5px);
         }
         .wechat-box img {
-            width: 200px; /* 增大图片尺寸 */
+            width: 200px;
             height: 200px;
             display: block;
             border-radius: 20px;
@@ -112,7 +112,7 @@
         }
         .wechat-box p {
             margin: 0;
-            font-size: 18px; /* 增大文字尺寸 */
+            font-size: 18px;
             font-weight: 900;
             color: #ffffff;
             line-height: 1.4;
@@ -209,10 +209,13 @@
             font-size: 1.5rem;
         }
 
+        /* 响应式调整 - 中等屏幕 */
         @media (max-width: 1100px) {
             .layout-wrapper {
                 flex-direction: column;
                 align-items: center;
+                gap: 30px;
+                padding: 30px 0;
             }
             .controls {
                 width: 100%;
@@ -220,23 +223,67 @@
                 flex-wrap: wrap;
                 justify-content: center;
                 position: static;
+                gap: 15px;
             }
             .wechat-box {
                 width: 100%;
-                order: -1;
+                order: 10; /* PC/平板下可能排最后，手机端单独处理 */
+                margin-top: 20px;
             }
             .btn {
                 flex: 1;
-                min-width: 200px;
+                min-width: 160px;
             }
         }
 
+        /* 响应式调整 - 手机端优化 */
         @media (max-width: 600px) {
-            .filename { font-size: 5rem; }
-            .card { min-height: 500px; padding: 25px; }
-            .btn { font-size: 1.2rem; padding: 18px; }
-            .wechat-box img { width: 140px; height: 140px; }
-            .wechat-box p { font-size: 14px; }
+            .layout-wrapper {
+                padding: 10px 0;
+            }
+            .filename { 
+                font-size: 5rem; 
+            }
+            .card { 
+                min-height: 400px; 
+                padding: 20px; 
+                margin-top: 10px; /* 卡片稍微下移一点，确保上方更空旷 */
+                border-radius: 40px;
+                border-width: 6px;
+            }
+            .btn { 
+                font-size: 1rem; 
+                padding: 15px 10px;
+                min-width: 0;
+                flex: 1 1 30%; /* 按钮更小，并列排布 */
+                border-radius: 20px;
+            }
+            .controls {
+                padding: 0 10px;
+                gap: 10px;
+            }
+            .wechat-box { 
+                order: 20; /* 强制广告放在最下面 */
+                padding: 15px;
+                border-radius: 25px;
+            }
+            .wechat-box img { 
+                width: 120px; 
+                height: 120px; 
+            }
+            .wechat-box p { 
+                font-size: 12px; 
+            }
+            #displayImage {
+                max-height: 350px;
+            }
+            .tip {
+                font-size: 12px;
+                margin-top: 15px;
+            }
+            .key-hint {
+                display: none; /* 手机端不需要按键提示 */
+            }
         }
     </style>
 <script type="importmap">
@@ -275,12 +322,6 @@
         </div>
 
         <div class="controls">
-            <!-- 广告区域：移动到右侧控制栏首位 -->
-            <div class="wechat-box">
-                <img src="WeiXin.jpg" alt="微信二维码">
-                <p>添加作者微信<br>获取更多服务</p>
-            </div>
-
             <button class="btn btn-secondary" onclick="prevWord()">前一张</button>
             
             <button id="randomBtn" class="btn btn-random" onclick="randomWord()">
@@ -292,6 +333,12 @@
                 下一个
                 <span class="key-hint">Enter</span>
             </button>
+
+            <!-- 广告区域：在 controls 的末尾 -->
+            <div class="wechat-box">
+                <img src="WeiXin.jpg" alt="微信二维码">
+                <p>添加作者微信<br>获取更多服务</p>
+            </div>
         </div>
     </div>
 
@@ -326,7 +373,6 @@
             const displayName = fileName.split('.')[0];
             const fullPath = "Edibujar/" + fileName + "?v=" + new Date().getTime();
 
-            // 1. 立即重置 UI 到文字状态
             isRevealed = false;
             imgElement.style.display = 'none';
             textLabel.innerText = displayName;
@@ -334,18 +380,12 @@
             errorElement.style.display = 'none';
             card.style.backgroundColor = '#1e293b';
 
-            // 2. 性能优化：立即开始预加载图片
-            // 设置预加载路径，但不显示，这样点击翻面时图片已经在缓存中了
+            // 预加载
             imgElement.src = fullPath;
-            
-            // 设置 onload 以处理一些卡片逻辑，但此时不执行显示操作
             imgElement.onload = function() {
-                // 预加载完成
                 console.log('Preloaded: ' + fileName);
             };
-
             imgElement.onerror = function() {
-                // 预加载失败的情况下，点击翻面会显示错误
                 console.warn('Preload failed: ' + fileName);
             };
         }
@@ -405,10 +445,7 @@
             const card = document.getElementById('mainCard');
             const errorElement = document.getElementById('error');
 
-            // 如果图片加载完成（可能是预加载好的），或者即使没加载完也显示（显示加载中的效果）
-            // 因为我们在 updateDisplay 已经设置了 src，这里只需要切换 display
             if (imgElement.complete && imgElement.naturalHeight === 0) {
-                // 如果之前预加载标记了错误（naturalHeight为0表示没加载出图）
                 errorElement.style.display = 'flex';
                 textLabel.style.display = 'none';
             } else {
