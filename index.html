@@ -16,61 +16,65 @@
             min-height: 100vh;
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto; /* 允许在内容过多时滚动 */
         }
 
-        /* 微信联系方式样式 */
+        /* 微信联系方式样式 - 增大尺寸 */
         .wechat-box {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(10px);
-            padding: 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            top: 30px;
+            right: 30px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(15px);
+            padding: 20px;
+            border-radius: 25px;
+            border: 2px solid rgba(249, 115, 22, 0.4);
             text-align: center;
             z-index: 100;
             transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .wechat-box:hover {
             border-color: #f97316;
-            transform: translateY(2px);
+            transform: scale(1.05);
+            background: rgba(30, 41, 59, 0.9);
         }
         .wechat-box img {
-            width: 80px;
-            height: 80px;
+            width: 140px; /* 从80px增大到140px */
+            height: 140px;
             display: block;
-            border-radius: 12px;
-            margin-bottom: 8px;
+            border-radius: 15px;
+            margin-bottom: 12px;
             object-fit: cover;
-            /* 覆盖全局 img 的隐藏属性 */
             display: inline-block !important; 
         }
         .wechat-box p {
             margin: 0;
-            font-size: 10px;
-            color: #94a3b8;
-            line-height: 1.4;
-            max-width: 80px;
+            font-size: 14px; /* 从10px增大到14px */
+            font-weight: bold;
+            color: #f1f5f9;
+            line-height: 1.5;
+            max-width: 140px;
         }
 
         .container {
             text-align: center;
             width: 95%;
-            max-width: 800px; 
+            max-width: 1000px; /* 增大容器最大宽度 */
+            padding: 100px 0; /* 为固定定位的微信框留出空间 */
         }
         .card {
             background: #1e293b;
-            min-height: 500px; 
+            min-height: 650px; /* 从500px增大到650px */
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50px; 
-            border: 6px solid #f97316; 
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8);
+            border-radius: 60px; 
+            border: 8px solid #f97316; 
+            box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.9);
             cursor: pointer;
-            padding: 30px;
+            padding: 40px;
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
         }
@@ -78,64 +82,65 @@
             transform: scale(0.96);
         }
         .filename {
-            font-size: 5rem; 
+            font-size: 8.5rem; /* 从5rem增大到8.5rem */
             font-weight: 900;
-            letter-spacing: -2px;
+            letter-spacing: -4px;
             word-break: break-word; 
             pointer-events: none;
-            line-height: 1.1;
+            line-height: 1;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
-        /* 主卡片中的图片样式 */
+        /* 主卡片中的图片样式 - 增大尺寸 */
         #displayImage {
             max-width: 100%;
-            max-height: 500px; 
-            border-radius: 25px;
+            max-height: 600px; /* 从500px增大到600px */
+            border-radius: 35px;
             display: none;
             object-fit: contain;
             pointer-events: none;
         }
         .controls {
-            margin-top: 40px;
+            margin-top: 50px;
             display: flex;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
         }
         .btn {
-            padding: 18px 30px; 
+            padding: 22px 45px; 
             background: #f97316;
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 30px;
             font-weight: bold;
             cursor: pointer;
             letter-spacing: 2px;
-            font-size: 1.1rem; 
-            box-shadow: 0 10px 20px -5px rgba(249, 115, 22, 0.4);
+            font-size: 1.4rem; 
+            box-shadow: 0 15px 30px -5px rgba(249, 115, 22, 0.4);
             transition: all 0.2s;
-            min-width: 140px;
+            min-width: 180px;
         }
         .btn-secondary {
             background: #334155;
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.3);
         }
         .btn-random {
             background: #8b5cf6;
-            box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 15px 30px -5px rgba(139, 92, 246, 0.4);
             display: none;
         }
         .btn:hover {
             filter: brightness(1.1);
-            transform: translateY(-3px);
+            transform: translateY(-5px);
         }
         .btn:active {
             transform: translateY(0);
         }
         p.tip {
-            margin-top: 30px;
-            opacity: 0.4;
-            font-size: 14px;
-            letter-spacing: 5px;
+            margin-top: 40px;
+            opacity: 0.5;
+            font-size: 16px;
+            letter-spacing: 6px;
             text-transform: uppercase;
         }
         
@@ -145,8 +150,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(20px);
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(25px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -154,30 +159,30 @@
         }
         .auth-box {
             background: #1e293b;
-            padding: 40px;
-            border-radius: 30px;
-            border: 2px solid #f97316;
+            padding: 50px;
+            border-radius: 40px;
+            border: 3px solid #f97316;
             text-align: center;
-            max-width: 400px;
+            max-width: 500px;
             width: 90%;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.6);
         }
         .auth-box h2 {
             margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
+            margin-bottom: 25px;
+            font-size: 2rem;
             color: #f97316;
         }
         .auth-box input {
             width: 100%;
-            padding: 15px;
+            padding: 20px;
             background: #0f172a;
             border: 2px solid #334155;
-            border-radius: 15px;
+            border-radius: 20px;
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             box-sizing: border-box;
             outline: none;
         }
@@ -186,8 +191,8 @@
         }
         .auth-box .error-msg {
             color: #fb7185;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
+            font-size: 1rem;
+            margin-bottom: 20px;
             display: none;
         }
 
@@ -196,40 +201,53 @@
             display: none;
             font-weight: bold;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
         .error-path {
-            font-size: 12px;
+            font-size: 14px;
             opacity: 0.6;
             font-family: monospace;
-            background: rgba(0,0,0,0.3);
-            padding: 10px;
-            border-radius: 10px;
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 15px;
             word-break: break-all;
+        }
+
+        @media (max-width: 850px) {
+            .wechat-box {
+                position: relative;
+                top: 0;
+                right: 0;
+                display: inline-block;
+                margin-bottom: 30px;
+                padding: 15px;
+            }
+            .container {
+                padding-top: 20px;
+            }
         }
 
         @media (max-width: 600px) {
             .filename {
-                font-size: 3rem;
+                font-size: 4.5rem;
             }
             .card {
-                min-height: 400px;
+                min-height: 450px;
             }
             .btn {
                 width: 100%;
-            }
-            .wechat-box {
-                top: 10px;
-                right: 10px;
-                padding: 8px;
+                font-size: 1.2rem;
             }
             .wechat-box img {
-                width: 50px;
-                height: 50px;
+                width: 100px;
+                height: 100px;
             }
             .wechat-box p {
-                font-size: 8px;
-                max-width: 50px;
+                font-size: 11px;
+                max-width: 100px;
+            }
+            #displayImage {
+                max-height: 400px;
             }
         }
     </style>
@@ -246,16 +264,10 @@
 </script>
 </head>
 <body>
-    <!-- 作者微信展示 -->
-    <div class="wechat-box">
-        <img src="WeiXin.jpg" alt="微信二维码">
-        <p>添加作者微信 获取更多服务</p>
-    </div>
-
     <div id="authOverlay">
         <div class="auth-box">
             <h2>安全验证</h2>
-            <p style="margin-bottom: 20px; opacity: 0.6;">请输入密码以继续使用</p>
+            <p style="margin-bottom: 25px; opacity: 0.7; font-size: 1.1rem;">请输入密码以继续使用</p>
             <input type="password" id="passwordInput" placeholder="请输入密码" onkeydown="if(event.key==='Enter') verifyPassword()">
             <div id="authError" class="error-msg">密码错误，请重试</div>
             <button class="btn" onclick="verifyPassword()" style="width: 100%; min-width: 0;">确认</button>
@@ -263,6 +275,12 @@
     </div>
 
     <div class="container">
+        <!-- 作者微信展示 -->
+        <div class="wechat-box">
+            <img src="WeiXin.jpg" alt="微信二维码">
+            <p>添加作者微信<br>获取更多服务</p>
+        </div>
+
         <div class="card" id="mainCard" onclick="handleCardClick()">
             <div id="textLabel" class="filename">READY</div>
             <img id="displayImage" src="" alt="Card Image">
@@ -304,6 +322,8 @@
             const imgElement = document.getElementById('displayImage');
             const errorElement = document.getElementById('error');
             const card = document.getElementById('mainCard');
+            
+            if (currentIndex === -1) return;
             
             const currentImageFile = images[currentIndex];
             const displayName = currentImageFile.split('.')[0];
