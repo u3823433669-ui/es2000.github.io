@@ -95,6 +95,60 @@
             letter-spacing: 5px;
             text-transform: uppercase;
         }
+        
+        /* 认证弹窗样式 */
+        #authOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(20px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .auth-box {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 30px;
+            border: 2px solid #f97316;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .auth-box h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: #f97316;
+        }
+        .auth-box input {
+            width: 100%;
+            padding: 15px;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .auth-box input:focus {
+            border-color: #f97316;
+        }
+        .auth-box .error-msg {
+            color: #fb7185;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: none;
+        }
+
         #error {
             color: #fb7185;
             display: none;
@@ -137,6 +191,16 @@
 </script>
 </head>
 <body>
+    <div id="authOverlay">
+        <div class="auth-box">
+            <h2>安全验证</h2>
+            <p style="margin-bottom: 20px; opacity: 0.6;">请输入密码以继续使用</p>
+            <input type="password" id="passwordInput" placeholder="请输入密码" onkeydown="if(event.key==='Enter') verifyPassword()">
+            <div id="authError" class="error-msg">密码错误，请重试</div>
+            <button class="btn" onclick="verifyPassword()" style="width: 100%; min-width: 0;">确认</button>
+        </div>
+    </div>
+
     <div class="container">
         <div class="card" id="mainCard" onclick="handleCardClick()">
             <div id="textLabel" class="filename">READY</div>
@@ -169,6 +233,9 @@
 
         let currentIndex = -1;
         let isRevealed = false;
+        let nextClickCount = 0;
+        let isAuthenticated = false;
+        const SECRET_PASSWORD = "punta";
 
         function updateDisplay() {
             const textLabel = document.getElementById('textLabel');
@@ -181,7 +248,6 @@
 
             isRevealed = false;
             
-            // 重置状态
             imgElement.onload = null;
             imgElement.onerror = null;
             imgElement.src = ""; 
@@ -195,6 +261,15 @@
         }
 
         function nextWord() {
+            // 每次点击“下一个”都计数
+            nextClickCount++;
+            
+            // 如果点击次数达到3次且未通过验证，显示验证框
+            if (nextClickCount >= 3 && !isAuthenticated) {
+                showAuth();
+                return;
+            }
+
             currentIndex = (currentIndex + 1) % images.length;
             updateDisplay();
         }
@@ -210,10 +285,8 @@
 
         function handleCardClick() {
             if (isRevealed) {
-                // 如果已经显示了图片，点击变回文字
                 updateDisplay();
             } else {
-                // 如果是文字，点击显示图片
                 revealImage();
             }
         }
@@ -244,10 +317,33 @@
                 errorElement.style.display = 'flex';
                 errorPath.innerText = "路径: " + "Edibujar/" + fileName;
                 card.style.backgroundColor = '#2d1a1a';
-                isRevealed = true; // 即使报错也标记为已动作，允许点击切回
+                isRevealed = true;
             };
 
             imgElement.src = fullPath;
+        }
+
+        // 验证逻辑
+        function showAuth() {
+            document.getElementById('authOverlay').style.display = 'flex';
+            document.getElementById('passwordInput').focus();
+        }
+
+        function verifyPassword() {
+            const input = document.getElementById('passwordInput');
+            const error = document.getElementById('authError');
+            
+            if (input.value === SECRET_PASSWORD) {
+                isAuthenticated = true;
+                document.getElementById('authOverlay').style.display = 'none';
+                // 验证通过后自动进入下一个词
+                currentIndex = (currentIndex + 1) % images.length;
+                updateDisplay();
+            } else {
+                error.style.display = 'block';
+                input.value = "";
+                input.focus();
+            }
         }
 
         window.onload = nextWord;
