@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word to Image - Fix</title>
+    <title>Word Flashcards</title>
     <style>
         body {
             margin: 0;
@@ -16,14 +16,13 @@
             min-height: 100vh;
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow: hidden;
         }
         .container {
             text-align: center;
             width: 90%;
             max-width: 500px;
+            padding: 20px 0;
         }
-        /* 卡片容器 */
         .card {
             background: #1e293b;
             min-height: 350px;
@@ -35,22 +34,21 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             cursor: pointer;
             padding: 20px;
-            transition: transform 0.2s ease, background-color 0.3s ease;
+            transition: all 0.3s ease;
             position: relative;
+            overflow: hidden;
         }
-        .card:active {
-            transform: scale(0.98);
+        .card:hover {
+            border-color: #fb923c;
+            transform: translateY(-5px);
         }
-        /* 文件名文字样式 */
         .filename {
             font-size: 3rem;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: -1px;
             word-break: break-all;
-            padding: 20px;
         }
-        /* 图片样式 */
         img {
             max-width: 100%;
             max-height: 400px;
@@ -58,48 +56,67 @@
             display: none;
             object-fit: contain;
         }
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
         .btn {
-            margin-top: 40px;
-            padding: 16px 32px;
+            padding: 16px 40px;
             background: #f97316;
             color: white;
             border: none;
             border-radius: 20px;
             font-weight: bold;
             cursor: pointer;
-            letter-spacing: 2px;
             font-size: 1.1rem;
             box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.4);
             transition: all 0.2s;
+            width: 100%;
         }
-        .btn:hover {
-            background: #fb923c;
-            transform: translateY(-2px);
-        }
-        .btn:active {
-            transform: translateY(0);
-        }
-        p.tip {
+        .btn:active { transform: scale(0.98); }
+        
+        .add-zone {
             margin-top: 20px;
-            opacity: 0.3;
-            font-size: 11px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 10px;
+            color: white;
+            border-radius: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            box-sizing: border-box;
         }
         #error {
             color: #fb7185;
             display: none;
-            padding: 20px;
+            text-align: center;
         }
         .error-path {
             display: block;
             font-family: monospace;
-            font-size: 12px;
+            font-size: 11px;
             margin-top: 10px;
-            background: rgba(0,0,0,0.3);
-            padding: 5px;
-            border-radius: 5px;
+            background: rgba(255,0,0,0.1);
+            padding: 8px;
+            border-radius: 8px;
             word-break: break-all;
+            color: #ffa1a1;
+        }
+        .tip {
+            opacity: 0.3;
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 2px;
         }
     </style>
 <script type="importmap">
@@ -116,26 +133,31 @@
 </head>
 <body>
     <div class="container">
-        <!-- 点击卡片区域显示图片 -->
         <div class="card" id="mainCard" onclick="revealImage()">
-            <div id="textLabel" class="filename">准备中...</div>
+            <div id="textLabel" class="filename">READY</div>
             <img id="displayImage" src="" alt="Result">
             <div id="error">
-                <div style="font-weight: bold; font-size: 1.2rem;">图片读取失败</div>
+                <div style="font-weight: bold;">无法显示图片</div>
                 <div id="errorDetails" class="error-path"></div>
+                <div style="font-size: 12px; margin-top: 10px; color: #94a3b8;">请检查文件名大小写及后缀是否完全一致</div>
             </div>
         </div>
 
-        <button class="btn" onclick="nextWord()">下一个单词</button>
-        <p class="tip">点击单词卡片查看图片</p>
+        <div class="controls">
+            <button class="btn" onclick="nextWord()">下一个单词</button>
+            
+            <div class="add-zone">
+                <input type="text" id="newImgName" placeholder="手动添加文件名 (如: test.jpg)">
+                <button class="btn" style="padding: 8px; font-size: 0.9rem; background: #334155;" onclick="addNewImage()">添加至随机列表</button>
+            </div>
+        </div>
+        
+        <p class="tip">点击单词查看图片</p>
     </div>
 
     <script>
-        /**
-         * 重要：请确保这些文件名在 Edibujar 文件夹中真实存在
-         * 且大小写完全一致
-         */
-        const images = [
+        // 初始图片列表
+        let images = [
             "pared.jpg",
             "peligroso.jpg"
         ];
@@ -143,37 +165,47 @@
         let currentImage = "";
         let isRevealed = false;
 
-        // 获取下一个单词（随机）
+        function addNewImage() {
+            const input = document.getElementById('newImgName');
+            const name = input.value.trim();
+            if (name) {
+                images.push(name);
+                alert("已添加 " + name + " 到列表。总计 " + images.length + " 张图。");
+                input.value = "";
+                nextWord();
+            }
+        }
+
         function nextWord() {
             const textLabel = document.getElementById('textLabel');
             const imgElement = document.getElementById('displayImage');
             const errorElement = document.getElementById('error');
             const card = document.getElementById('mainCard');
             
-            // 随机选择一个不同的图片
-            let nextIndex;
-            do {
-                nextIndex = Math.floor(Math.random() * images.length);
-            } while (images.length > 1 && images[nextIndex] === currentImage);
-            
+            // 确保有图片可选
+            if (images.length === 0) {
+                textLabel.innerText = "列表为空";
+                return;
+            }
+
+            // 随机选择
+            let nextIndex = Math.floor(Math.random() * images.length);
             currentImage = images[nextIndex];
             isRevealed = false;
 
-            // 提取文件名展示文字
-            const displayName = currentImage.split('.')[0];
-
-            // 重置状态
-            textLabel.innerText = displayName;
+            // 显示去掉后缀的名称
+            textLabel.innerText = currentImage.split('.')[0];
+            
+            // 重置 UI
             textLabel.style.display = 'block';
             imgElement.style.display = 'none';
-            imgElement.src = ""; // 彻底卸载当前图片
+            imgElement.src = "";
             errorElement.style.display = 'none';
             card.style.backgroundColor = '#1e293b';
         }
 
-        // 点击文字后显示图片
         function revealImage() {
-            if (isRevealed) return; // 防止重复点击
+            if (isRevealed || !currentImage) return;
 
             const textLabel = document.getElementById('textLabel');
             const imgElement = document.getElementById('displayImage');
@@ -181,12 +213,9 @@
             const errorDetails = document.getElementById('errorDetails');
             const card = document.getElementById('mainCard');
 
-            // 路径拼写必须精确
             const fullPath = "Edibujar/" + currentImage;
             
-            // 预设加载中状态（可选）
             textLabel.innerText = "加载中...";
-            
             imgElement.src = fullPath;
             
             imgElement.onload = function() {
@@ -199,13 +228,12 @@
             imgElement.onerror = function() {
                 textLabel.style.display = 'none';
                 errorElement.style.display = 'block';
-                errorDetails.innerText = "找不到文件: " + fullPath;
-                console.error("加载失败，请检查文件是否存在: " + fullPath);
-                isRevealed = true; // 即使失败也标记为已揭晓，允许用户点“下一个”
+                errorDetails.innerText = "完整路径: " + window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1) + fullPath;
+                isRevealed = true;
             };
         }
 
-        // 初始化显示第一个
+        // 首次加载
         window.onload = nextWord;
     </script>
 </body>
