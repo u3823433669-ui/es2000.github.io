@@ -55,15 +55,16 @@
         .card:active {
             transform: scale(0.97);
         }
-        /* 增大单词文字 */
+        /* 增大单词文字 - 初始状态 */
         .filename {
             font-size: 11rem;
             font-weight: 900;
-            letter-spacing: -6px;
-            word-break: break-word; 
+            letter-spacing: -4px;
+            white-space: nowrap; /* 强制单行显示 */
             pointer-events: none;
-            line-height: 0.9;
+            line-height: 1;
             text-shadow: 0 15px 30px rgba(0,0,0,0.4);
+            transition: font-size 0.1s ease-out;
         }
         /* 增大翻面后的图片 */
         #displayImage {
@@ -227,7 +228,7 @@
             }
             .wechat-box {
                 width: 100%;
-                order: 10; /* PC/平板下可能排最后，手机端单独处理 */
+                order: 10;
                 margin-top: 20px;
             }
             .btn {
@@ -240,49 +241,55 @@
         @media (max-width: 600px) {
             .layout-wrapper {
                 padding: 10px 0;
+                width: 100%;
+            }
+            .container {
+                padding: 0 10px;
             }
             .filename { 
                 font-size: 5rem; 
             }
             .card { 
-                min-height: 400px; 
-                padding: 20px; 
-                margin-top: 10px; /* 卡片稍微下移一点，确保上方更空旷 */
+                min-height: 420px; 
+                padding: 15px; 
+                margin-top: 5px;
                 border-radius: 40px;
                 border-width: 6px;
             }
             .btn { 
                 font-size: 1rem; 
-                padding: 15px 10px;
+                padding: 14px 8px;
                 min-width: 0;
-                flex: 1 1 30%; /* 按钮更小，并列排布 */
-                border-radius: 20px;
+                flex: 1 1 30%;
+                border-radius: 18px;
             }
             .controls {
                 padding: 0 10px;
-                gap: 10px;
+                gap: 8px;
             }
             .wechat-box { 
-                order: 20; /* 强制广告放在最下面 */
+                order: 20; 
                 padding: 15px;
                 border-radius: 25px;
+                margin-top: 30px;
             }
             .wechat-box img { 
-                width: 120px; 
-                height: 120px; 
+                width: 140px; 
+                height: 140px; 
             }
             .wechat-box p { 
-                font-size: 12px; 
+                font-size: 14px; 
             }
             #displayImage {
-                max-height: 350px;
+                max-height: 380px;
             }
             .tip {
-                font-size: 12px;
+                font-size: 11px;
                 margin-top: 15px;
+                letter-spacing: 1px;
             }
             .key-hint {
-                display: none; /* 手机端不需要按键提示 */
+                display: none;
             }
         }
     </style>
@@ -334,7 +341,7 @@
                 <span class="key-hint">Enter</span>
             </button>
 
-            <!-- 广告区域：在 controls 的末尾 -->
+            <!-- 广告区域 -->
             <div class="wechat-box">
                 <img src="WeiXin.jpg" alt="微信二维码">
                 <p>添加作者微信<br>获取更多服务</p>
@@ -361,6 +368,25 @@
         let lastActionWasRandom = false; 
         const SECRET_PASSWORD = "punta";
 
+        // 核心优化：动态调整字体大小确保不换行
+        function fitText(el) {
+            const container = el.parentElement;
+            const style = window.getComputedStyle(container);
+            const paddingLeft = parseFloat(style.paddingLeft);
+            const paddingRight = parseFloat(style.paddingRight);
+            const maxWidth = container.clientWidth - paddingLeft - paddingRight;
+            
+            // 根据屏幕宽度设置初始字体大小（rem 转 px）
+            let fontSize = window.innerWidth <= 600 ? 80 : 176; 
+            el.style.fontSize = fontSize + 'px';
+            
+            // 循环减小字号直到宽度合适
+            while (el.offsetWidth > maxWidth && fontSize > 20) {
+                fontSize -= 2;
+                el.style.fontSize = fontSize + 'px';
+            }
+        }
+
         function updateDisplay() {
             const textLabel = document.getElementById('textLabel');
             const imgElement = document.getElementById('displayImage');
@@ -380,7 +406,10 @@
             errorElement.style.display = 'none';
             card.style.backgroundColor = '#1e293b';
 
-            // 预加载
+            // 设置文字后立即调用缩放函数
+            fitText(textLabel);
+
+            // 预加载图片
             imgElement.src = fullPath;
             imgElement.onload = function() {
                 console.log('Preloaded: ' + fileName);
@@ -491,6 +520,14 @@
                 input.focus();
             }
         }
+
+        // 监听窗口大小变化以重新调整字体
+        window.addEventListener('resize', () => {
+            const textLabel = document.getElementById('textLabel');
+            if (textLabel.style.display !== 'none') {
+                fitText(textLabel);
+            }
+        });
 
         window.onload = nextWord;
     </script>
