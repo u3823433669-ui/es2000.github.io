@@ -350,7 +350,7 @@
     </div>
 
     <script>
-        const images = [
+        const fallbackImages = [
             "alentar.jpg", "arana.jpg", "barba.jpg", "cantidad.jpg", "cartel.jpg",
             "cartelera.jpg", "comodo.jpg", "creido.jpg", "crisis.jpg", "criticar.jpg",
             "debilitar.jpg", "encima.jpg", "enfadar.jpg", "estimar.jpg", "fantasma.jpg",
@@ -360,6 +360,49 @@
             "potenciar.jpg", "punta.jpg", "rutina.jpg", "terremoto.jpg", "tortilla.jpg",
             "vigilar.jpg", "viuda.jpg"
         ];
+
+        let images = [...fallbackImages];
+
+        async function loadDynamicImages() {
+            let owner = "u3823433669-ui";
+            let repo = "es2000.github.io";
+
+            const hostname = window.location.hostname;
+            const pathname = window.location.pathname;
+
+            // 智能分析当前访问的 github pages 仓库所有者和仓库名
+            if (hostname.endsWith('.github.io')) {
+                owner = hostname.replace('.github.io', '');
+                const pathParts = pathname.split('/').filter(Boolean);
+                if (pathParts.length > 0) {
+                    repo = pathParts[0];
+                }
+            }
+
+            const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/Edibujar`;
+            console.log("正在尝试从 GitHub API 动态加载图片列表:", apiUrl);
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`GitHub API HTTP 状态码: ${response.status}`);
+                }
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    const validExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+                    const fetchedImages = data
+                        .filter(file => file.type === 'file' && validExtensions.some(ext => file.name.toLowerCase().endsWith(ext)))
+                        .map(file => file.name);
+                    
+                    if (fetchedImages.length > 0) {
+                        images = fetchedImages;
+                        console.log("🎉 成功从 GitHub 动态加载到 " + images.length + " 个图片:", images);
+                    }
+                }
+            } catch (error) {
+                console.warn("无法从 GitHub API 动态读取文件（将自动使用默认写死的文件名列表）:", error);
+            }
+        }
 
         let currentIndex = -1;
         let isRevealed = false;
@@ -529,7 +572,10 @@
             }
         });
 
-        window.onload = nextWord;
+        window.onload = async function() {
+            await loadDynamicImages();
+            nextWord();
+        };
     </script>
 </body>
 </html>
