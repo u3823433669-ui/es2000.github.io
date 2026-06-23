@@ -150,6 +150,32 @@
             transform: scale(0.98);
         }
         
+        .btn-next-main {
+            font-size: 2.3rem;
+            padding: 24px 80px;
+            width: 90%;
+            max-width: 580px;
+            border-radius: 50px;
+            margin-top: 25px;
+            box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.4);
+            transition: all 0.2s ease-in-out;
+            border: 2px solid #ff7a1c;
+        }
+        .btn-next-main:hover {
+            box-shadow: 0 15px 30px -5px rgba(249, 115, 22, 0.7);
+            transform: scale(1.02);
+        }
+        
+        .progress-hint {
+            margin-top: 25px;
+            font-size: 1.4rem;
+            color: #ff7a1c;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 1.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        
         .tip {
             margin-top: 30px;
             opacity: 0.6;
@@ -263,6 +289,18 @@
                 flex: 1 1 30%;
                 border-radius: 18px;
             }
+            .btn-next-main {
+                font-size: 1.8rem;
+                padding: 22px 30px;
+                min-width: 95%;
+                width: 95%;
+                border-radius: 40px;
+                margin-top: 20px;
+            }
+            .progress-hint {
+                font-size: 1.15rem;
+                margin-top: 15px;
+            }
             .controls {
                 padding: 0 10px;
                 gap: 8px;
@@ -325,6 +363,19 @@
                     <span>图片读取失败</span>
                 </div>
             </div>
+            
+            <div style="display: flex; justify-content: center; width: 100%;">
+                <button id="nextBtn" class="btn btn-next-main" onclick="nextWord()">
+                    下一个
+                    <span class="key-hint">Enter</span>
+                </button>
+            </div>
+
+            <!-- 进度显示 -->
+            <div class="progress-hint">
+                第 <span id="currentWordNum">0</span> / <span id="totalWordNum">0</span> 个单词 (<span id="progressPercentage">0</span>%)
+            </div>
+
             <p class="tip">快捷键：[空格] 翻转卡片 | [回车] 下一个/随机单词</p>
         </div>
 
@@ -335,11 +386,6 @@
             
             <button id="randomBtn" class="btn btn-random" onclick="randomWord()">
                 随机单词
-                <span class="key-hint">Enter</span>
-            </button>
-            
-            <button id="nextBtn" class="btn" onclick="nextWord()">
-                下一个
                 <span class="key-hint">Enter</span>
             </button>
 
@@ -413,6 +459,13 @@
         let lastActionWasRandom = false; 
         const SECRET_PASSWORD = "punta";
 
+        // 滑动相关状态变量
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+        let isSwiped = false;
+
         // 核心优化：动态调整字体大小确保不换行
         function fitText(el) {
             const container = el.parentElement;
@@ -450,6 +503,15 @@
             textLabel.style.display = 'block';
             errorElement.style.display = 'none';
             card.style.backgroundColor = '#1e293b';
+
+            // 更新进度 UI
+            const totalCount = images.length;
+            const currentNum = currentIndex + 1;
+            const progressPct = totalCount > 0 ? Math.round((currentNum / totalCount) * 100) : 0;
+            
+            document.getElementById('currentWordNum').innerText = currentNum;
+            document.getElementById('totalWordNum').innerText = totalCount;
+            document.getElementById('progressPercentage').innerText = progressPct;
 
             // 设置文字后立即调用缩放函数
             fitText(textLabel);
@@ -522,12 +584,53 @@
         }
 
         function handleCardClick() {
+            if (isSwiped) {
+                isSwiped = false;
+                return;
+            }
             if (isRevealed) {
                 updateDisplay();
             } else {
                 revealImage();
             }
         }
+
+        // 绑定触屏手势进行左右滑动切换
+        const mainCard = document.getElementById('mainCard');
+        mainCard.addEventListener('touchstart', function(event) {
+            touchStartX = event.changedTouches[0].screenX;
+            touchStartY = event.changedTouches[0].screenY;
+            isSwiped = false;
+        }, { passive: true });
+
+        mainCard.addEventListener('touchmove', function(event) {
+            const currentX = event.changedTouches[0].screenX;
+            const currentY = event.changedTouches[0].screenY;
+            const diffX = touchStartX - currentX;
+            const diffY = Math.abs(touchStartY - currentY);
+            
+            // 如果位移过大，说明是滑动，避免松手时触发 handleCardClick 的翻转
+            if (Math.abs(diffX) > 15 || diffY > 15) {
+                isSwiped = true;
+            }
+        }, { passive: true });
+
+        mainCard.addEventListener('touchend', function(event) {
+            touchEndX = event.changedTouches[0].screenX;
+            touchEndY = event.changedTouches[0].screenY;
+            
+            const diffX = touchStartX - touchEndX;
+            const diffY = Math.abs(touchStartY - touchEndY);
+            
+            // 左滑 -> 下一个 (阈值为 50 像素，且水平偏移大于垂直偏移)
+            if (diffX > 50 && diffY < diffX) {
+                nextWord();
+            } 
+            // 右滑 -> 前一张
+            else if (diffX < -50 && diffY < Math.abs(diffX)) {
+                prevWord();
+            }
+        }, { passive: true });
 
         function revealImage() {
             if (currentIndex === -1) return;
