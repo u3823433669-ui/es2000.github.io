@@ -331,6 +331,8 @@
         <div class="controls">
             <button class="btn btn-secondary" onclick="prevWord()">前一张</button>
             
+            <button class="btn btn-secondary" onclick="next20Words()">下20个</button>
+            
             <button id="randomBtn" class="btn btn-random" onclick="randomWord()">
                 随机单词
                 <span class="key-hint">Enter</span>
@@ -460,6 +462,24 @@
             imgElement.onerror = function() {
                 console.warn('Preload failed: ' + fileName);
             };
+        }
+
+        function next20Words() {
+            lastActionWasRandom = false;
+            nextClickCount += 20;
+            
+            if (nextClickCount >= 3 && !isAuthenticated) {
+                showAuth();
+                return;
+            }
+
+            if (images.length === 0) return;
+            if (currentIndex === -1) {
+                currentIndex = 19 % images.length;
+            } else {
+                currentIndex = (currentIndex + 20) % images.length;
+            }
+            updateDisplay();
         }
 
         function nextWord() {
