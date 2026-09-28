@@ -1,34 +1,253 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Flashcards</title>
+    <title>Español Palabras - 西班牙语视觉图卡背词</title>
+    <meta name="description" content="极简清爽的西班牙语图卡背词网站，看图识词、直观记忆。">
     <style>
-        body {
+        :root {
+            --bg-page: #ffffff;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --border-light: #e2e8f0;
+            --primary: #f97316;
+            --primary-hover: #ea580c;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: #020617;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        /* 顶部清爽导航栏 */
+        .site-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-light);
+            width: 100%;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow-x: hidden;
-            overflow-y: auto;
+            font-size: 1.1rem;
+            font-weight: 900;
         }
 
-        /* 布局容器 */
+        .brand-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-link {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 6px 12px;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary);
+        }
+
+        .nav-btn-study {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 9px 22px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-btn-study:hover {
+            background: var(--primary-hover);
+        }
+
+        /* 视图容器切换 */
+        .page-view {
+            display: none;
+            width: 100%;
+            flex: 1;
+        }
+
+        .page-view.active-view {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Google 广告位预留 */
+        .ad-container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .ad-box {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            padding: 16px;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .ad-box .ad-tag {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        /* ========== 主页 (极简白色风格) ========== */
+        .home-content {
+            max-width: 900px;
+            margin: 60px auto 40px auto;
+            padding: 0 24px;
+            text-align: center;
+        }
+
+        .home-title {
+            font-size: clamp(2.4rem, 5vw, 3.8rem);
+            font-weight: 900;
+            line-height: 1.2;
+            letter-spacing: -1px;
+            color: var(--text-main);
+            margin-bottom: 20px;
+        }
+
+        .home-title span {
+            color: var(--primary);
+        }
+
+        .home-desc {
+            font-size: 1.25rem;
+            color: var(--text-sub);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .btn-enter-study {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.35rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.35);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-enter-study:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(249, 115, 22, 0.45);
+        }
+
+        /* ========== 背单词学习页 ========== */
+        .study-view-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 50px;
+        }
+
+        .study-top-bar {
+            width: 95%;
+            max-width: 1300px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0 10px 0;
+        }
+
+        .btn-back-home {
+            background: #f1f5f9;
+            color: var(--text-sub);
+            border: 1px solid var(--border-light);
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-back-home:hover {
+            color: var(--text-main);
+            background: #e2e8f0;
+        }
+
         .layout-wrapper {
             display: flex;
             align-items: flex-start;
             justify-content: center;
             width: 95%;
-            max-width: 1400px;
-            gap: 60px;
-            padding: 60px 0;
+            max-width: 1300px;
+            gap: 40px;
+            padding: 15px 0 30px 0;
         }
 
         .container {
@@ -36,243 +255,327 @@
             text-align: center;
         }
 
-        /* 增大卡片尺寸 */
+        /* 纯直角卡片 - 白色清爽风格 */
         .card {
-            background: #1e293b;
-            min-height: 750px;
+            background: #ffffff;
+            min-height: 700px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 0px !important; /* 彻底直角图片框 */
-            border: 8px solid #f97316; 
-            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.9);
+            border-radius: 0px !important; /* 彻底直角 */
+            border: 6px solid var(--primary); 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
             cursor: pointer;
-            padding: 30px;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 25px;
             position: relative;
             overflow: hidden;
+            transition: transform 0.15s ease;
         }
+
         .card:active {
-            transform: scale(0.97);
+            transform: scale(0.99);
         }
-        /* 增大单词文字 - 初始状态 */
+
+        /* 正面单词大文字 */
         .filename {
-            font-size: 11rem;
+            font-size: 10rem;
             font-weight: 900;
-            letter-spacing: -4px;
-            white-space: nowrap; /* 强制单行显示 */
+            letter-spacing: -3px;
+            white-space: nowrap;
             pointer-events: none;
             line-height: 1;
-            text-shadow: 0 15px 30px rgba(0,0,0,0.4);
+            color: var(--text-main);
             transition: font-size 0.1s ease-out;
         }
-        /* 直角图片：确保四角字母不被遮挡 */
+
+        /* 背面图片：彻底直角无遮挡 */
         #displayImage {
             max-width: 100%;
-            max-height: 700px;
+            max-height: 650px;
             border-radius: 0px !important; /* 彻底直角 */
             display: none;
             object-fit: contain;
             pointer-events: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
-        /* 浮动“下一个”快捷按钮 (无论滚动到哪里都在屏幕右下角) */
+        /* 主“下一个”按钮 */
+        .btn-next-main {
+            font-size: 2rem;
+            padding: 20px 70px;
+            width: 90%;
+            max-width: 540px;
+            margin-top: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
+            transition: all 0.2s;
+        }
+
+        .btn-next-main:hover {
+            background: var(--primary-hover);
+            transform: scale(1.02);
+        }
+
+        .btn-next-main:active {
+            transform: scale(0.98);
+        }
+
+        /* 浮动“下一个”快捷按钮 (右下角随时可点) */
         .floating-next-btn {
             position: fixed;
             bottom: 30px;
             right: 30px;
             z-index: 999;
-            background: linear-gradient(135deg, #f97316, #ea580c);
+            background: var(--primary);
             color: white;
-            border: 3px solid #ffedd5;
-            padding: 18px 36px;
-            border-radius: 50px;
-            font-size: 1.6rem;
+            border: 2px solid #ffffff;
+            padding: 16px 32px;
+            font-size: 1.4rem;
             font-weight: 900;
             cursor: pointer;
-            box-shadow: 0 12px 30px rgba(249, 115, 22, 0.6);
-            display: flex;
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.5);
+            display: none;
             align-items: center;
-            gap: 10px;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .floating-next-btn:hover {
-            transform: scale(1.08) translateY(-3px);
-            box-shadow: 0 18px 36px rgba(249, 115, 22, 0.8);
-            background: linear-gradient(135deg, #fb923c, #f97316);
-        }
-        .floating-next-btn:active {
-            transform: scale(0.95);
+            gap: 8px;
+            transition: all 0.2s;
         }
 
-        /* 右侧控制栏：包含广告和按钮 */
+        .floating-next-btn:hover {
+            background: var(--primary-hover);
+            transform: scale(1.05);
+        }
+
+        /* 进度提示 */
+        .progress-hint {
+            margin-top: 20px;
+            font-size: 1.25rem;
+            color: var(--primary);
+            font-weight: 800;
+            text-align: center;
+        }
+
+        /* 右侧操作栏 */
         .controls {
             display: flex;
             flex-direction: column;
-            gap: 25px;
-            width: 280px;
+            gap: 15px;
+            width: 260px;
             position: sticky;
-            top: 60px;
+            top: 80px;
         }
 
-        /* 增大作者微信区域 */
-        .wechat-box {
-            background: rgba(30, 41, 59, 0.8);
-            backdrop-filter: blur(20px);
-            padding: 25px;
-            border-radius: 35px;
-            border: 3px solid rgba(249, 115, 22, 0.5);
-            text-align: center;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-            transition: all 0.3s ease;
-            margin-bottom: 10px;
-        }
-        .wechat-box:hover {
-            border-color: #f97316;
-            transform: translateY(-5px);
-        }
-        .wechat-box img {
-            width: 200px;
-            height: 200px;
-            display: block;
-            border-radius: 20px;
-            margin: 0 auto 15px auto;
-            object-fit: cover;
-            display: inline-block !important; 
-        }
-        .wechat-box p {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 900;
-            color: #ffffff;
-            line-height: 1.4;
-        }
-
-        .btn {
-            padding: 25px 30px; 
-            background: #f97316;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-weight: bold;
+        .btn-secondary {
+            padding: 18px 20px;
+            background: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid var(--border-light);
+            font-weight: 700;
+            font-size: 1.2rem;
             cursor: pointer;
-            letter-spacing: 1px;
-            font-size: 1.5rem; 
-            box-shadow: 0 12px 24px -5px rgba(249, 115, 22, 0.4);
             transition: all 0.2s;
             text-align: center;
         }
-        .btn-secondary {
-            background: #334155;
-            box-shadow: 0 12px 24px -5px rgba(0, 0, 0, 0.3);
-        }
-        .btn-random {
-            background: #8b5cf6;
-            box-shadow: 0 12px 24px -5px rgba(139, 92, 246, 0.4);
-            display: none;
-        }
-        .btn:hover {
-            filter: brightness(1.1);
-            transform: scale(1.02);
-        }
-        .btn:active {
-            transform: scale(0.98);
-        }
-        
-        .btn-next-main {
-            font-size: 2.3rem;
-            padding: 24px 80px;
-            width: 90%;
-            max-width: 580px;
-            border-radius: 50px;
-            margin-top: 25px;
-            box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.4);
-            transition: all 0.2s ease-in-out;
-            border: 2px solid #ff7a1c;
-        }
-        .btn-next-main:hover {
-            box-shadow: 0 15px 30px -5px rgba(249, 115, 22, 0.7);
-            transform: scale(1.02);
-        }
-        
-        .progress-hint {
-            margin-top: 25px;
-            font-size: 1.4rem;
-            color: #ff7a1c;
-            font-weight: bold;
-            text-align: center;
-            letter-spacing: 1.5px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-        }
-        
-        .tip {
-            margin-top: 30px;
-            opacity: 0.6;
-            font-size: 16px;
-            letter-spacing: 3px;
-            text-align: center;
-            color: #94a3b8;
-        }
-        .key-hint {
-            display: block;
-            font-size: 12px;
-            margin-top: 5px;
-            opacity: 0.7;
-            font-weight: normal;
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
         }
 
-        /* 认证弹窗 */
-        #authOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(2, 6, 23, 0.9);
-            backdrop-filter: blur(30px);
+        .btn-random {
+            padding: 18px 20px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
             display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .auth-box {
-            background: #1e293b;
-            padding: 60px;
-            border-radius: 50px;
-            border: 4px solid #f97316;
+            transition: all 0.2s;
             text-align: center;
-            max-width: 550px;
-            width: 90%;
         }
+
+        .btn-random:hover {
+            background: #7c3aed;
+        }
+
+        /* 侧边微信区域 */
+        .study-wechat-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-light);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .study-wechat-box img {
+            width: 170px;
+            height: 170px;
+            display: block;
+            margin: 0 auto 10px auto;
+            object-fit: cover;
+        }
+
+        .study-wechat-box p {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+
+        /* 安全验证密码弹窗 (20个单词后强制弹出) */
+        #authOverlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(15, 23, 42, 0.75) !important;
+            backdrop-filter: blur(8px) !important;
+            display: none;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 999999 !important;
+        }
+
+        .auth-box {
+            background: #ffffff;
+            padding: 40px 30px;
+            border: 3px solid var(--primary);
+            text-align: center;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .btn-close-auth {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            color: #94a3b8;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .btn-close-auth:hover {
+            color: #0f172a;
+        }
+
+        .auth-wechat-notice {
+            background: #fff7ed;
+            border: 1px solid #ffedd5;
+            color: #ea580c;
+            padding: 12px 16px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 15px 0 20px 0;
+            letter-spacing: 0.5px;
+            border-radius: 4px;
+        }
+
+        .auth-wechat-notice b {
+            color: #c2410c;
+            font-weight: 900;
+            margin-left: 4px;
+            user-select: all;
+        }
+
+        .auth-box h2 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .auth-box p {
+            margin-bottom: 15px;
+            color: var(--text-sub);
+            font-size: 1.05rem;
+        }
+
         .auth-box input {
             width: 100%;
-            padding: 25px;
-            background: #0f172a;
-            border: 2px solid #334155;
-            border-radius: 25px;
-            color: white;
-            font-size: 2rem;
+            padding: 16px;
+            background: #f8fafc;
+            border: 2px solid var(--border-light);
+            color: var(--text-main);
+            font-size: 1.5rem;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 16px;
             outline: none;
         }
 
-        #error {
-            color: #fb7185;
-            display: none;
-            flex-direction: column;
-            gap: 20px;
-            font-size: 1.5rem;
+        .auth-box input:focus {
+            border-color: var(--primary);
         }
 
-        /* 响应式调整 - 中等屏幕 */
+        .auth-btn-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-confirm-auth {
+            background: var(--primary);
+            color: white;
+            border: none;
+            flex: 1;
+            padding: 16px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-confirm-auth:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-exit-auth {
+            background: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid var(--border-light);
+            padding: 16px 28px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-exit-auth:hover {
+            background: #e2e8f0;
+        }
+
+        #error {
+            color: #ef4444;
+            display: none;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        /* 全局简易页脚 */
+        .site-footer {
+            border-top: 1px solid var(--border-light);
+            background: #ffffff;
+            padding: 24px;
+            margin-top: auto;
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+        }
+
+        /* 响应式调整 */
         @media (max-width: 1100px) {
             .layout-wrapper {
                 flex-direction: column;
                 align-items: center;
-                gap: 30px;
-                padding: 30px 0;
+                gap: 20px;
             }
             .controls {
                 width: 100%;
@@ -280,164 +583,187 @@
                 flex-wrap: wrap;
                 justify-content: center;
                 position: static;
-                gap: 15px;
             }
-            .wechat-box {
+            .study-wechat-box {
                 width: 100%;
                 order: 10;
-                margin-top: 20px;
+                margin-top: 15px;
             }
-            .btn {
+            .btn-secondary {
                 flex: 1;
-                min-width: 160px;
+                min-width: 140px;
             }
         }
 
-        /* 响应式调整 - 手机端优化 */
         @media (max-width: 600px) {
-            .layout-wrapper {
-                padding: 10px 0;
-                width: 100%;
+            .home-title {
+                font-size: 2.2rem;
             }
-            .container {
-                padding: 0 10px;
+            .home-desc {
+                font-size: 1.05rem;
             }
             .filename { 
-                font-size: 5rem; 
+                font-size: 4.8rem; 
             }
             .card { 
-                min-height: 420px; 
+                min-height: 380px; 
                 padding: 15px; 
-                margin-top: 5px;
-                border-radius: 0px !important;
-                border-width: 6px;
-            }
-            .btn { 
-                font-size: 1rem; 
-                padding: 14px 8px;
-                min-width: 0;
-                flex: 1 1 30%;
-                border-radius: 18px;
+                border-width: 4px;
             }
             .btn-next-main {
-                font-size: 1.8rem;
-                padding: 22px 30px;
-                min-width: 95%;
+                font-size: 1.5rem;
+                padding: 16px 20px;
                 width: 95%;
-                border-radius: 40px;
-                margin-top: 20px;
-            }
-            .progress-hint {
-                font-size: 1.15rem;
-                margin-top: 15px;
-            }
-            .controls {
-                padding: 0 10px;
-                gap: 8px;
-            }
-            .wechat-box { 
-                order: 20; 
-                padding: 15px;
-                border-radius: 25px;
-                margin-top: 30px;
-            }
-            .wechat-box img { 
-                width: 140px; 
-                height: 140px; 
-            }
-            .wechat-box p { 
-                font-size: 14px; 
             }
             #displayImage {
-                max-height: 380px;
+                max-height: 340px;
             }
-            .tip {
-                font-size: 11px;
-                margin-top: 15px;
-                letter-spacing: 1px;
-            }
-            .key-hint {
-                display: none;
+            .floating-next-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                font-size: 1.2rem;
             }
         }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.37.0",
-    "vite": "https://esm.sh/vite@^7.3.1",
-    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
-  }
-}
-</script>
 </head>
 <body>
-    <!-- 屏幕右下角悬浮下一个快捷按钮 -->
-    <button class="floating-next-btn" onclick="nextWord()" title="快捷下一个">
+
+    <!-- 顶部导航栏 -->
+    <header class="site-nav">
+        <div class="nav-container">
+            <div class="brand-logo" onclick="navigateTo('home')">
+                <div class="brand-icon">🇪🇸</div>
+                <span class="brand-name">Español Palabras</span>
+            </div>
+
+            <div class="nav-actions">
+                <button class="nav-link" id="navHomeLink" onclick="navigateTo('home')">首页</button>
+                <button class="nav-link" id="navStudyLink" onclick="navigateTo('study')">背单词</button>
+                <button class="nav-btn-study" onclick="navigateTo('study')">进入学习 ➔</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Google 广告位预留（顶部） -->
+    <div class="ad-container">
+        <div class="ad-box">
+            <span class="ad-tag">Google 广告位预留 · 顶部横幅</span>
+            <span>后期将 AdSense 广告代码替换至此处即可展示</span>
+        </div>
+    </div>
+
+    <!-- ===================================== -->
+    <!-- 页面 1: 清爽主页 (HOME VIEW)          -->
+    <!-- ===================================== -->
+    <main id="homeView" class="page-view active-view">
+        <div class="home-content">
+            <h1 class="home-title">
+                以图绘词 · <span>轻松学西班牙语</span>
+            </h1>
+            <p class="home-desc">
+                结合视觉插画联想，正面看词、点击翻面看图，高效沉浸记忆。
+            </p>
+            <div>
+                <button class="btn-enter-study" onclick="navigateTo('study')">
+                    开始背单词 ➔
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===================================== -->
+    <!-- 页面 2: 背单词学习界面 (STUDY VIEW)    -->
+    <!-- ===================================== -->
+    <main id="studyView" class="page-view">
+        <div class="study-view-wrapper">
+            <!-- 顶栏：返回与状态 -->
+            <div class="study-top-bar">
+                <button class="btn-back-home" onclick="navigateTo('home')">
+                    ← 返回首页
+                </button>
+                <div style="font-size: 0.9rem; color: #64748b;">
+                    词库：<b style="color: var(--primary);">Edibujar270928</b>
+                </div>
+            </div>
+
+            <!-- 卡片核心区域 -->
+            <div class="layout-wrapper">
+                <div class="container">
+                    <!-- 直角卡片：点击翻转 -->
+                    <div class="card" id="mainCard" onclick="handleCardClick()">
+                        <div id="textLabel" class="filename">READY</div>
+                        <img id="displayImage" src="" alt="Card Image">
+                        <div id="error">
+                            <span>图片读取失败</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: center; width: 100%;">
+                        <button id="nextBtn" class="btn-next-main" onclick="nextWord()">
+                            下一个 ➔
+                        </button>
+                    </div>
+
+                    <!-- 进度显示 -->
+                    <div class="progress-hint">
+                        第 <span id="currentWordNum">0</span> / <span id="totalWordNum">0</span> 个单词 (<span id="progressPercentage">0</span>%)
+                    </div>
+                </div>
+
+                <!-- 侧边操作栏 -->
+                <div class="controls">
+                    <button class="btn-secondary" onclick="prevWord()">前一张</button>
+                    
+                    <button id="randomBtn" class="btn-random" onclick="randomWord()">
+                        随机单词
+                    </button>
+
+                    <!-- 微信二维码 -->
+                    <div class="study-wechat-box">
+                        <img src="WeiXin.jpg" alt="微信二维码">
+                        <p>添加作者微信<br>获取更多服务</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 悬浮下一个快捷按钮 (仅在背单词页激活) -->
+    <button id="floatingNextBtn" class="floating-next-btn" onclick="nextWord()" title="快捷下一个">
         下一个 ➔
     </button>
 
+    <!-- 安全验证密码弹窗 (核心保留：点20个单词后触发) -->
     <div id="authOverlay">
         <div class="auth-box">
-            <h2 style="color: #f97316; font-size: 2.5rem; margin-bottom: 10px;">安全验证</h2>
-            <p style="margin-bottom: 35px; opacity: 0.7; font-size: 1.2rem;">请输入密码以继续使用</p>
+            <button class="btn-close-auth" onclick="closeAuth()" title="退出">✕</button>
+            <h2>安全验证</h2>
+            <p>免费体验已达 20 个单词，请输入密码继续学习</p>
+
+            <div class="auth-wechat-notice">
+                需要密码请加微信<b>EspanolA1A2</b>
+            </div>
+
             <input type="password" id="passwordInput" placeholder="请输入密码" onkeydown="if(event.key==='Enter') verifyPassword()">
-            <div id="authError" style="color: #fb7185; margin-bottom: 25px; display: none; font-weight: bold;">密码错误，请重试</div>
-            <button class="btn" onclick="verifyPassword()" style="width: 100%;">确认</button>
-        </div>
-    </div>
+            <div id="authError" style="color: #ef4444; margin-bottom: 15px; display: none; font-weight: 700;">密码错误，请重试</div>
 
-    <div class="layout-wrapper">
-        <div class="container">
-            <div class="card" id="mainCard" onclick="handleCardClick()">
-                <div id="textLabel" class="filename">READY</div>
-                <img id="displayImage" src="" alt="Card Image">
-                <div id="error">
-                    <span>图片读取失败</span>
-                </div>
-            </div>
-            
-            <div style="display: flex; justify-content: center; width: 100%;">
-                <button id="nextBtn" class="btn btn-next-main" onclick="nextWord()">
-                    下一个 ➔
-                    <span class="key-hint">Enter</span>
-                </button>
-            </div>
-
-            <!-- 进度显示 -->
-            <div class="progress-hint">
-                第 <span id="currentWordNum">0</span> / <span id="totalWordNum">0</span> 个单词 (<span id="progressPercentage">0</span>%)
-            </div>
-
-            <p class="tip">快捷键：[空格] 翻转卡片 | [回车] 下一个/随机单词</p>
-        </div>
-
-        <div class="controls">
-            <!-- 侧栏顶部直接按的下一个按钮 -->
-            <button class="btn" style="background: linear-gradient(135deg, #f97316, #ea580c); font-size: 1.8rem; padding: 22px 20px; border-radius: 25px; box-shadow: 0 10px 25px rgba(249, 115, 22, 0.5);" onclick="nextWord()">
-                下一个 ➔
-            </button>
-
-            <button class="btn btn-secondary" onclick="prevWord()">前一张</button>
-            
-            <button class="btn btn-secondary" onclick="next20Words()">下20个</button>
-            
-            <button id="randomBtn" class="btn btn-random" onclick="randomWord()">
-                随机单词
-                <span class="key-hint">Enter</span>
-            </button>
-
-            <!-- 广告区域 -->
-            <div class="wechat-box">
-                <img src="WeiXin.jpg" alt="微信二维码">
-                <p>添加作者微信<br>获取更多服务</p>
+            <div class="auth-btn-row">
+                <button class="btn-confirm-auth" onclick="verifyPassword()">确认</button>
+                <button class="btn-exit-auth" onclick="closeAuth()">退出</button>
             </div>
         </div>
     </div>
+
+    <!-- 底部清爽页脚 -->
+    <footer class="site-footer">
+        <p>© 2026 Español Palabras · 让背西语单词变得生动有趣</p>
+    </footer>
 
     <script>
+        // 目标图片文件夹名称
+        const IMAGE_FOLDER_NAME = "Edibujar270928";
+
         const fallbackImages = [
             "alentar.jpg", "arana.jpg", "barba.jpg", "cantidad.jpg", "cartel.jpg",
             "cartelera.jpg", "comodo.jpg", "creido.jpg", "crisis.jpg", "criticar.jpg",
@@ -450,7 +776,51 @@
         ];
 
         let images = [...fallbackImages];
+        let currentView = 'home';
 
+        // 页面切换
+        function navigateTo(viewName) {
+            currentView = viewName;
+
+            const homeView = document.getElementById('homeView');
+            const studyView = document.getElementById('studyView');
+            const floatingBtn = document.getElementById('floatingNextBtn');
+            const navHome = document.getElementById('navHomeLink');
+            const navStudy = document.getElementById('navStudyLink');
+
+            if (viewName === 'study') {
+                window.location.hash = 'study';
+                homeView.classList.remove('active-view');
+                studyView.classList.add('active-view');
+                floatingBtn.style.display = 'flex';
+                navHome.classList.remove('active');
+                navStudy.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                if (currentIndex === -1) {
+                    nextWord();
+                } else {
+                    updateDisplay();
+                }
+            } else {
+                // 回到首页时清理 hash，防止刷新页面时自动跳转
+                if (window.location.hash) {
+                    try {
+                        history.replaceState(null, '', window.location.pathname + window.location.search);
+                    } catch (e) {
+                        window.location.hash = '';
+                    }
+                }
+                studyView.classList.remove('active-view');
+                homeView.classList.add('active-view');
+                floatingBtn.style.display = 'none';
+                navHome.classList.add('active');
+                navStudy.classList.remove('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // 动态加载 GitHub 仓库内的图片文件夹
         async function loadDynamicImages() {
             let owner = "u3823433669-ui";
             let repo = "es2000.github.io";
@@ -458,7 +828,6 @@
             const hostname = window.location.hostname;
             const pathname = window.location.pathname;
 
-            // 智能分析当前访问的 github pages 仓库所有者和仓库名
             if (hostname.endsWith('.github.io')) {
                 owner = hostname.replace('.github.io', '');
                 const pathParts = pathname.split('/').filter(Boolean);
@@ -467,7 +836,7 @@
                 }
             }
 
-            const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/Edibujar`;
+            const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${IMAGE_FOLDER_NAME}`;
             console.log("正在尝试从 GitHub API 动态加载图片列表:", apiUrl);
 
             try {
@@ -484,41 +853,39 @@
                     
                     if (fetchedImages.length > 0) {
                         images = fetchedImages;
-                        console.log("🎉 成功从 GitHub 动态加载到 " + images.length + " 个图片:", images);
+                        console.log("🎉 成功加载到 " + images.length + " 个图片:", images);
                     }
                 }
             } catch (error) {
-                console.warn("无法从 GitHub API 动态读取文件（将自动使用默认写死的文件名列表）:", error);
+                console.warn("使用默认写死的文件名列表:", error);
             }
         }
 
         let currentIndex = -1;
         let isRevealed = false;
-        let nextClickCount = 0;
-        let isAuthenticated = false;
+        let isAuthenticated = false; // 初始未认证，不读缓存，确保必须验证
         let lastActionWasRandom = false; 
         const SECRET_PASSWORD = "punta";
 
-        // 滑动相关状态变量
+        // 滑动相关
         let touchStartX = 0;
         let touchStartY = 0;
         let touchEndX = 0;
         let touchEndY = 0;
         let isSwiped = false;
 
-        // 核心优化：动态调整字体大小确保不换行
+        // 动态自适应字号
         function fitText(el) {
             const container = el.parentElement;
+            if (!container) return;
             const style = window.getComputedStyle(container);
             const paddingLeft = parseFloat(style.paddingLeft);
             const paddingRight = parseFloat(style.paddingRight);
             const maxWidth = container.clientWidth - paddingLeft - paddingRight;
             
-            // 根据屏幕宽度设置初始字体大小（rem 转 px）
-            let fontSize = window.innerWidth <= 600 ? 80 : 176; 
+            let fontSize = window.innerWidth <= 600 ? 76 : 160; 
             el.style.fontSize = fontSize + 'px';
             
-            // 循环减小字号直到宽度合适
             while (el.offsetWidth > maxWidth && fontSize > 20) {
                 fontSize -= 2;
                 el.style.fontSize = fontSize + 'px';
@@ -535,16 +902,15 @@
             
             const fileName = images[currentIndex];
             const displayName = fileName.split('.')[0];
-            const fullPath = "Edibujar/" + fileName + "?v=" + new Date().getTime();
+            const fullPath = IMAGE_FOLDER_NAME + "/" + fileName + "?v=" + new Date().getTime();
 
             isRevealed = false;
             imgElement.style.display = 'none';
             textLabel.innerText = displayName;
             textLabel.style.display = 'block';
             errorElement.style.display = 'none';
-            card.style.backgroundColor = '#1e293b';
+            card.style.backgroundColor = '#ffffff';
 
-            // 更新进度 UI
             const totalCount = images.length;
             const currentNum = currentIndex + 1;
             const progressPct = totalCount > 0 ? Math.round((currentNum / totalCount) * 100) : 0;
@@ -553,52 +919,38 @@
             document.getElementById('totalWordNum').innerText = totalCount;
             document.getElementById('progressPercentage').innerText = progressPct;
 
-            // 设置文字后立即调用缩放函数
             fitText(textLabel);
 
-            // 预加载图片
             imgElement.src = fullPath;
-            imgElement.onload = function() {
-                console.log('Preloaded: ' + fileName);
-            };
-            imgElement.onerror = function() {
-                console.warn('Preload failed: ' + fileName);
-            };
         }
 
-        function next20Words() {
-            lastActionWasRandom = false;
-            nextClickCount += 20;
-            
-            if (nextClickCount >= 3 && !isAuthenticated) {
-                showAuth();
-                return;
-            }
-
-            if (images.length === 0) return;
-            if (currentIndex === -1) {
-                currentIndex = 19 % images.length;
-            } else {
-                currentIndex = (currentIndex + 20) % images.length;
-            }
-            updateDisplay();
-        }
-
+        // 下一个单词（未解锁前只能按顺序看前20个单词，看完第20个单词弹出密码框）
         function nextWord() {
             lastActionWasRandom = false;
-            nextClickCount++;
-            
-            if (nextClickCount >= 3 && !isAuthenticated) {
+
+            // 如果未认证且当前已经在第20个单词（索引从0开始算，19就是第20个），点击下一个强制拦截并弹出密码提示框
+            if (!isAuthenticated && currentIndex >= 19) {
                 showAuth();
                 return;
             }
 
-            currentIndex = (currentIndex + 1) % images.length;
+            // 第一次进入学习页时，初始化到第1个单词（索引0）
+            if (currentIndex === -1) {
+                currentIndex = 0;
+            } else {
+                currentIndex = (currentIndex + 1) % images.length;
+            }
             updateDisplay();
         }
 
         function prevWord() {
             lastActionWasRandom = false;
+
+            // 未输入密码时，只能在前20个单词范围内往回看，严禁从第1个单词向前绕到词库末尾
+            if (!isAuthenticated && currentIndex <= 0) {
+                return;
+            }
+
             if (currentIndex <= 0) {
                 currentIndex = images.length - 1;
             } else {
@@ -609,7 +961,7 @@
 
         function randomWord() {
             lastActionWasRandom = true;
-            if (!isAuthenticated && nextClickCount >= 3) {
+            if (!isAuthenticated) {
                 showAuth();
                 return;
             }
@@ -635,7 +987,7 @@
             }
         }
 
-        // 绑定触屏手势进行左右滑动切换
+        // 手机触屏左右滑动
         const mainCard = document.getElementById('mainCard');
         mainCard.addEventListener('touchstart', function(event) {
             touchStartX = event.changedTouches[0].screenX;
@@ -649,7 +1001,6 @@
             const diffX = touchStartX - currentX;
             const diffY = Math.abs(touchStartY - currentY);
             
-            // 如果位移过大，说明是滑动，避免松手时触发 handleCardClick 的翻转
             if (Math.abs(diffX) > 15 || diffY > 15) {
                 isSwiped = true;
             }
@@ -662,12 +1013,9 @@
             const diffX = touchStartX - touchEndX;
             const diffY = Math.abs(touchStartY - touchEndY);
             
-            // 左滑 -> 下一个 (阈值为 50 像素，且水平偏移大于垂直偏移)
             if (diffX > 50 && diffY < diffX) {
                 nextWord();
-            } 
-            // 右滑 -> 前一张
-            else if (diffX < -50 && diffY < Math.abs(diffX)) {
+            } else if (diffX < -50 && diffY < Math.abs(diffX)) {
                 prevWord();
             }
         }, { passive: true });
@@ -681,18 +1029,23 @@
             const errorElement = document.getElementById('error');
 
             if (imgElement.complete && imgElement.naturalHeight === 0) {
-                errorElement.style.display = 'flex';
+                errorElement.style.display = 'block';
                 textLabel.style.display = 'none';
             } else {
                 textLabel.style.display = 'none';
                 imgElement.style.display = 'block';
-                card.style.backgroundColor = '#0f172a';
+                card.style.backgroundColor = '#ffffff';
             }
             isRevealed = true;
         }
 
-        // 键盘监听
+        // 键盘控制（仅在学习界面生效）
         window.addEventListener('keydown', (e) => {
+            if (e.code === 'Escape') {
+                closeAuth();
+                return;
+            }
+            if (currentView !== 'study') return;
             if (document.getElementById('authOverlay').style.display === 'flex') return;
 
             if (e.code === 'Space') {
@@ -708,17 +1061,32 @@
         });
 
         function showAuth() {
-            document.getElementById('authOverlay').style.display = 'flex';
-            document.getElementById('passwordInput').focus();
+            const overlay = document.getElementById('authOverlay');
+            overlay.style.display = 'flex';
+            const input = document.getElementById('passwordInput');
+            input.value = "";
+            document.getElementById('authError').style.display = 'none';
+            setTimeout(() => input.focus(), 50);
+        }
+
+        function closeAuth() {
+            document.getElementById('authOverlay').style.display = 'none';
         }
 
         function verifyPassword() {
             const input = document.getElementById('passwordInput');
-            if (input.value === SECRET_PASSWORD) {
+            const val = input.value.trim().toLowerCase();
+            if (val === SECRET_PASSWORD.toLowerCase()) {
                 isAuthenticated = true;
                 document.getElementById('authOverlay').style.display = 'none';
                 document.getElementById('randomBtn').style.display = 'block';
-                currentIndex = (currentIndex + 1) % images.length;
+
+                // 解锁后立即展示第21个单词
+                if (currentIndex === 19) {
+                    currentIndex = 20 % images.length;
+                } else {
+                    currentIndex = (currentIndex + 1) % images.length;
+                }
                 updateDisplay();
             } else {
                 document.getElementById('authError').style.display = 'block';
@@ -727,17 +1095,32 @@
             }
         }
 
-        // 监听窗口大小变化以重新调整字体
         window.addEventListener('resize', () => {
+            if (currentView !== 'study') return;
             const textLabel = document.getElementById('textLabel');
-            if (textLabel.style.display !== 'none') {
+            if (textLabel && textLabel.style.display !== 'none') {
                 fitText(textLabel);
             }
         });
 
         window.onload = async function() {
+            // 清理旧缓存，确保打开或刷新均严格执行20个单词限制
+            try {
+                sessionStorage.clear();
+                localStorage.removeItem('vocab_auth');
+            } catch (e) {}
+
+            // 无论任何情况，页面打开一律停留在主页，必须用户主动点击才进入背单词
+            if (window.location.hash) {
+                try {
+                    history.replaceState(null, '', window.location.pathname + window.location.search);
+                } catch (e) {
+                    window.location.hash = '';
+                }
+            }
+            navigateTo('home');
+
             await loadDynamicImages();
-            nextWord();
         };
     </script>
 </body>
